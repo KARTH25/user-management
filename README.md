@@ -34,12 +34,12 @@ Repository holds the user management related APIs
 
   2. Running usermanagement as docker requires few credentials related with sending mails create a test smtp server from https://mailtrap.io/ and create a file names .env in root directory and copy paste the credentials in the file like
   
-  MAIL_SERVER=<MAIL_SERVER_Value>
-  MAIL_PORT=<MAIL_PORT_Value>
-  MAIL_USERNAME=<MAIL_USERNAME_Value>
-  MAIL_PASSWORD=<MAIL_PASSWORD_value>
-  MAIL_USE_TLS=True
-  MAIL_USE_SSL=False
+    MAIL_SERVER=<MAIL_SERVER_Value>
+    MAIL_PORT=<MAIL_PORT_Value>
+    MAIL_USERNAME=<MAIL_USERNAME_Value>
+    MAIL_PASSWORD=<MAIL_PASSWORD_value>
+    MAIL_USE_TLS=True
+    MAIL_USE_SSL=False
 
   3. Using built docker image run a container using command -> docker run -it -d -p 5000:5000 --env-file ./.env    <image_name> 
 
