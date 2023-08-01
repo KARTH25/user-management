@@ -1,9 +1,10 @@
 from flask import Flask, jsonify, request
 from dbUtils import db, create_db, seed_db, drop_db, Users
 from schemaUtils import ma, user_schema, users_schema, user_schema_with_password
-from flask_jwt_extended import JWTManager, jwt_required, create_access_token
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, decode_token
 from flask_mail import Mail, Message
-
+from flask_migrate import Migrate
+import random
 import os
 
 ## Base Dir
@@ -14,11 +15,17 @@ app = Flask(__name__)
 ## APP config for SQLite DB
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(baseDir, 'users.db')
 ## App config for JWT Secret Key
-app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY')
+app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY') if os.environ.get('JWT_SECRET_KEY') else os.environ['JWT_SECRET_KEY']
 ## App config for Mail server
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER')
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER') if os.environ.get('MAIL_SERVER') else os.environ['MAIL_SERVER']
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME') if os.environ.get('MAIL_USERNAME') else os.environ['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') if os.environ.get('MAIL_PASSWORD') else os.environ['MAIL_PASSWORD']
+app.config['MAIL_PORT'] = os.environ.get('MAIL_PORT') if os.environ.get('MAIL_PORT') else os.environ['MAIL_PORT']
+app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS') if os.environ.get('MAIL_USE_TLS') else os.environ['MAIL_USE_TLS']
+app.config['MAIL_USE_SSL'] = os.environ.get('MAIL_USE_SSL') if os.environ.get('MAIL_USE_SSL') else os.environ['MAIL_USE_SSL']
+
+## Precheck Exception
+precheck_exception_routes = ['/healthCheck','/createUser','/login'] 
 
 ## Initializing DB 
 db.init_app(app)
@@ -32,10 +39,12 @@ jwt = JWTManager(app)
 ## Initializing mail
 mail = Mail(app)
 
+## Initializing configurations for database upgrade
+migrate = Migrate(app, db)
+
 '''
      CLI Commands for Database creation / seed / drop
 '''
-
 @app.cli.command('createdb')
 def create():
     create_db()
@@ -55,6 +64,7 @@ def drop():
 ## Healthcheck for APIs
 @app.route('/healthCheck')
 def home():
+    print("checking health status")
     return jsonify(status="healthy")
 
 ## Route for creating new user
@@ -100,15 +110,39 @@ def login():
         else:
             return jsonify(error="User login failed bad user credentials"), 401
 
+## Route for generating OTP for retrieving lost password to email
+'''
+   @route /generateOtp/<email>
+   @methods GET
+'''
+@app.route('/generateOtp/<string:email>', methods=['GET'])
+def generateOtp(email : str):
+    ## Querying data from userInfo table and filtering based on email
+    userInfo = Users.query.filter_by(email=email).first()
+    ## If userInfo for the email exists returning response
+    if userInfo:
+        otp = str(random.randint(100000, 999999))
+        userInfo.otp = otp
+        db.session.commit()
+        msg = Message("Your OTP to reset the password is : " + otp, sender="admin@streetshoppe.com", recipients=[email])
+        print("forming message " , msg)
+        mail.send(msg)
+        print("message sent")
+        return jsonify(message="OTP for retrieving your password has been send to : " + email)
+    ## If no userInfo exists for the email returning error message
+    else:
+        return jsonify(error="User for this mail id does not exists")
+
 ## Route for retrieving lost password to email
 '''
    @route /retrievePassword/<email>
    @methods GET
 '''
-@app.route('/retrievePassword/<string:email>', methods=['GET'])
+@app.route('/retrievePassword/<string:email>', methods=['POST'])
 def retrievePassword(email : str):
+    requestBody = request.json
     ## Querying data from userInfo table and filtering based on email
-    userInfo = Users.query.filter_by(email=email).first()
+    userInfo = Users.query.filter_by(email=email, otp=requestBody['otp']).first()
     ## If userInfo for the email exists returning response
     if userInfo:
         msg = Message("your lost password is : " + userInfo.password, sender="admin@streetshoppe.com", recipients=[email])
@@ -116,7 +150,7 @@ def retrievePassword(email : str):
         return jsonify(message="your password has been sent to mail : " + email)
     ## If no userInfo exists for the email returning error message
     else:
-        return jsonify(error="User for this mail id does not exists")
+        return jsonify(error="Invalid credentials")
 
 ## Route for get user information based on email
 '''
@@ -177,4 +211,18 @@ def deleteUserInfo(email:str):
         return jsonify(message=(f"User deleted successfully with email {email}")), 200
     else:
         return jsonify(message=(f"User not found with mail {email}")), 400
+
+
+
+@app.before_request
+def router_precheck():
+    if(request.path not in precheck_exception_routes) and (request.headers['Authorization']):
+       print("validating token")
+       encoded_jwt_token = request.headers['Authorization'].split(' ')[1]
+       decoded_jwt_token = decode_token(encoded_token=encoded_jwt_token, csrf_value=None, allow_expired=False)
+       if(decoded_jwt_token['sub']['email'] != request.headers['email']):
+           return jsonify(error="Invalid Token to access resources")
+    else:
+        print("valid user")
+          
 

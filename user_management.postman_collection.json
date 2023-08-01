@@ -1,0 +1,247 @@
+{
+	"info": {
+		"_postman_id": "4135f26b-11bb-4bb9-b1a0-8f9e7eaba9a6",
+		"name": "user_management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/healthCheck",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"healthCheck"
+					]
+				},
+				"description": "To check the health of the APIs"
+			},
+			"response": []
+		},
+		{
+			"name": "User Login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\" : \"msdhoni@gmail.com\",\n    \"password\" : 123\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"login"
+					]
+				},
+				"description": "To login user with email and password and generate JWT access token for accessing other resources"
+			},
+			"response": []
+		},
+		{
+			"name": "Create new user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n    \"first_name\" : \"ms\", \n    \"last_name\" : \"dhoni\", \n    \"email\" : \"msdhoni@gmail.com\", \n    \"password\" : 123\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/createUser",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"createUser"
+					]
+				},
+				"description": "To create new user with first name, last name, email and password informations"
+			},
+			"response": []
+		},
+		{
+			"name": "Generate OTP for retrieving lost password",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/generateOtp/msdhoni@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"generateOtp",
+						"msdhoni@gmail.com"
+					]
+				},
+				"description": "Generate OTP based on email for the User for verify and get the lost password"
+			},
+			"response": []
+		},
+		{
+			"name": "retrieving lost password using generated OTP",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"otp\" : \"<otp send to mail>\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/retrievePassword/msdhoni@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"retrievePassword",
+						"msdhoni@gmail.com"
+					]
+				},
+				"description": "Using the generated OTP verify the user and send back the lost password to users email"
+			},
+			"response": []
+		},
+		{
+			"name": "Get current user information",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MDg3Njg0NSwianRpIjoiYzgyYWUyOTQtOWQ2ZC00YzY3LTkwYTQtN2JiNTI3NTFkMjA4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6Im1zZGhvbmlAZ21haWwuY29tIn0sIm5iZiI6MTY5MDg3Njg0NSwiZXhwIjoxNjkwODc3NzQ1fQ.je5puK24hiILr-YePyHWuVNISx3_8hyPmNVuKgMgTKM",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/getUserInfo/mahendrasinghdhoni@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"getUserInfo",
+						"mahendrasinghdhoni@gmail.com"
+					]
+				},
+				"description": "To get first name, last name, email based on email address provided"
+			},
+			"response": []
+		},
+		{
+			"name": "Update user information",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MDg3Njg0NSwianRpIjoiYzgyYWUyOTQtOWQ2ZC00YzY3LTkwYTQtN2JiNTI3NTFkMjA4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6Im1zZGhvbmlAZ21haWwuY29tIn0sIm5iZiI6MTY5MDg3Njg0NSwiZXhwIjoxNjkwODc3NzQ1fQ.je5puK24hiILr-YePyHWuVNISx3_8hyPmNVuKgMgTKM",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"first_name\" : \"mahendrasingh\",\n   \"email\" : \"mahendrasinghdhoni@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/updateUserInfo/msdhoni@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"updateUserInfo",
+						"msdhoni@gmail.com"
+					]
+				},
+				"description": "Update user information fields"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete user",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MDg3Njg0NSwianRpIjoiYzgyYWUyOTQtOWQ2ZC00YzY3LTkwYTQtN2JiNTI3NTFkMjA4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6Im1zZGhvbmlAZ21haWwuY29tIn0sIm5iZiI6MTY5MDg3Njg0NSwiZXhwIjoxNjkwODc3NzQ1fQ.je5puK24hiILr-YePyHWuVNISx3_8hyPmNVuKgMgTKM",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:5000/deleteUserInfo/mahendrasinghdhoni@gmail.com",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"deleteUserInfo",
+						"mahendrasinghdhoni@gmail.com"
+					],
+					"query": [
+						{
+							"key": "Authorization",
+							"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5MDM5MjY2MywianRpIjoiMTliNDBhNDgtZWJkNC00YmI4LWI0ZDUtM2QwOWEwYjgzMjA5IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6eyJlbWFpbCI6ImthcnRoaWNrMjUwMjE5OTlAZ21haWwuY29tIn0sIm5iZiI6MTY5MDM5MjY2MywiZXhwIjoxNjkwMzkzNTYzfQ.khrHJZpNx59boq3Iprnge7SPGI1doHFeVk890swH7",
+							"disabled": true
+						}
+					]
+				},
+				"description": "To delete the current user with email id"
+			},
+			"response": []
+		}
+	]
+}

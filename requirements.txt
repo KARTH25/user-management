@@ -4,3 +4,4 @@ Flask-Mail==0.9.1
 flask-marshmallow==0.15.0
 Flask-SQLAlchemy==3.0.3
 SQLAlchemy==2.0.15
+Flask-Migrate==4.0.4

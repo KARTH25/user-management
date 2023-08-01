@@ -28,6 +28,7 @@ class Users(db.Model):
     last_name = Column(String)
     email = Column(String, unique=True)
     password = Column(String)
+    otp = Column(String)
 
 
 
